@@ -1,0 +1,6 @@
+# dsh-paper-theme bundle patch：向 profile 插入一行。
+# 该行同时是宿主 Loader 条目（no-op）与 `dsh.client` 浏览器 roster 条目。
+
+- insert:
+    - id: dsh-paper-theme
+      name: 'dsh-paper-theme'
