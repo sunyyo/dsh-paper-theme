@@ -1,15 +1,16 @@
 # dsh-paper-theme
 
-把 DSH Web 界面换成**暖纸色主题**的客户端插件。只改浅色模式；暗色模式与不装插件时完全一致。
+把 DSH Web 界面换成**暖纸色主题**的客户端插件。浅色是米黄纸，暗色是「纸灯」暖黑（R9 起）—— 两种模式都是纸，但暗色不是浅色的反相。
 
-当前版本 **0.2.2**（41 项 token 覆盖，配色修订 **R7 = 色度分层 + 补徽标文字色**、**R8 = 补齐 0.2.2 新 UI 的两处冷色**；2026-11 按 **dsh 0.2.2-rc.1** 复核，删 1 项失效 token、同步 1 个暗色默认值、R8 补 5 项），校对基准 **dsh 0.2.2-rc.1**。
+当前版本 **0.3.1**（44 项 token 覆盖，配色修订 **R7 = 色度分层 + 补徽标文字色**、**R8 = 补齐 0.2.2 新 UI 的两处冷色**、**R9 = 暗色「纸灯」**、**R9.1 = 暗色文字压暗**；**2026-11-12 按 dsh 0.2.2-rc.2 复核：宿主无删除、无默认值漂移，新增 36 个 token 全部无需覆盖**），校对基准 **dsh 0.2.2-rc.2**。
 
 ## 它做什么
 
-通过 `ctx.theme.overrideTokens()` 注册一层 41 项 token 覆盖：
+通过 `ctx.theme.overrideTokens()` 注册一层 44 项 token 覆盖：
 
-- `light` = 纸色暖调；
-- `dark` = 宿主当前版本的默认引用（`var(--dsw-static-*)` 或原字面量），所以切到暗色时外观不变。
+- `light` = 米黄纸色（R9 没有动浅色，一个值都没改）；
+- `dark` = 暗色「纸灯」的暖黑值，写死字面量。宿主没有暖色 static ramp 可引用，所以这一列
+  不再靠 `var(--dsw-static-*)` 自动跟随 —— 宿主将来改暗色默认值，本表不会变（这是有意的代价）。
 
 | 分组 | 项数 | 覆盖的 token |
 |---|---|---|
@@ -21,6 +22,7 @@
 | 气泡 / 选择 / 状态 / 文档 | 5 | `specific-bubble`、`specific-selector`、`state-business-primary`、`-tertiary`、`bg-document-preview` |
 | 滚动条 | 4 | `scrollbar-bg-l1`、`-l2`、`scrollbar-hover-l1`、`-l2` |
 | 交互与链接 | 3 | `alias-link`、`alias-label-primary-bluish`、`interactive-bg-hover-solid` |
+| 暗色文字（R9） | 3 | `alias-label-primary`、`-secondary`、`-tertiary` |
 | Schedule 插画（R8） | 4 | `illustration-background`、`-backing`、`-detail`、`-surface` |
 | 选择器描边（R8） | 1 | `button-ghost-active-border` |
 
@@ -35,6 +37,12 @@
 R8 补的两处也落在这条梯度上：Schedule 空状态插画 底 `rgb(240,233,211)` → 背板 `rgb(246,240,212)` →
 文档面 `rgb(252,250,241)`、细节 `rgb(198,184,152)`；选择器选中格 1px 描边 `rgb(150,135,105)`。
 
+**暗色「纸灯」梯度（R9）**：底 `#1c1a16` → 侧栏 `#211e19` → 面 `#2f2a20` → 抬起面 `#453d2f`；
+文字三档 `#ddd4bf` / `#b8ae9a` / `#afa492`，链接 `#c9a67b`，强调 `#d2a970`。
+实测对比度：正文 11.78:1、次要 7.91:1、三级 7.07:1、链接 7.63:1 —— 全部在 AAA 的 7:1 之上。
+暗色不是浅色反相：明度按宿主暗色各面之间的相对关系重排（底 → 侧栏 → 面 → 抬起面逐级抬亮
+1.08–1.15 倍），色相统一到 30–40°，彩度压到低饱和 —— 暗色里暖色一旦过艳就显脏。
+
 ### 配色修订
 
 一轮口味试错的完整台账。黄味与亮度是两个**独立旋钮**：
@@ -48,7 +56,8 @@ R8 补的两处也落在这条梯度上：Schedule 空状态插画 底 `rgb(240,
 | R5 | 只加黄味 | R−B = 20（初版 87%），亮度 0.911 | 「再黄一些吧」→ 还是回到初版 |
 | **R6** | 全部回到 R1 | R−B = 23，亮度 0.918 | 「恢复原版吧」 |
 | **R7** | 色度分层 + 补 1 项 | 主底不变；选中/悬停改彩度 | 真机评审后：① 首屏「预览版」徽标底已随 `state-business-tertiary` 变暖、文字仍是宿主冷蓝，是浅色界面唯一成片冷色 → 新增 `label-primary-bluish` 覆盖；② 选中/悬停/浅槽/状态底四个语义原来全在 43–46° 色相、明度最大差 17 级，悬停与选中的 RGB 差只有 (1,0,3) → 选中提彩度（R−B 46 → 60）、悬停降彩度（42 → 23），浅槽不动 |
-| **R8（当前）** | 新 UI 冷色补齐 +5 项 | 主底不变 | dsh 0.2.2-rc.1 真机评审：新 UI 出现两处「不透明 + 主界面可见」的冷色 —— ① 自动化任务空状态插画（`illustration-*`，宿主蓝灰 `#f5f7fa`/`#cad2db`/`#edf0f4`）在纸色页面上成片发冷；② 日期/时间选择器选中格的 1px inset 描边用冷灰 `#979da6`，套在暖色选中块上违和 → 插画 4 个画色换纸色梯度、描边换同明度暖棕 `rgb(150,135,105)`，其余（inset/shadow、语义色、纯 alpha、品牌色）不动 |
+| **R8** | 新 UI 冷色补齐 +5 项 | 主底不变 | dsh 0.2.2-rc.1 真机评审：新 UI 出现两处「不透明 + 主界面可见」的冷色 —— ① 自动化任务空状态插画（`illustration-*`，宿主蓝灰 `#f5f7fa`/`#cad2db`/`#edf0f4`）在纸色页面上成片发冷；② 日期/时间选择器选中格的 1px inset 描边用冷灰 `#979da6`，套在暖色选中块上违和 → 插画 4 个画色换纸色梯度、描边换同明度暖棕 `rgb(150,135,105)`，其余（inset/shadow、语义色、纯 alpha、品牌色）不动 |
+| **R9（当前）** | 暗色重做 +3 项 | 浅色一个值都没动 | 用户要求暗色也走纸色。宿主暗色是冷蓝调，与浅色纸色气质断裂 → `dark` 列 41 项全换成暖黑字面量，并新增 `label-primary/-secondary/-tertiary` 三支文字色（只换底色不换文字，暖黑底上会浮一层冷白字）。先出 A 暖灰去蓝 / B 墨夜纸 / C 纸灯 三方向真机同屏对比，选定 **C 纸灯**（明度略抬、棕味更重）；实测正文 11.78:1、链接 7.63:1（R9.1 压暗，原 15.14 / 9.86） |
 
 - **黄味** = `R − B` 之差（中性色该差为 0）。这条轴全程只有 `0`（纯灰白）–`23`（初版）这么宽，
   中间档 10 / 16 / 20 都试过、都没留住 —— 纸的暖度是口味题，折中值不一定讨好。
@@ -147,8 +156,9 @@ node E:\dsh\dsh-asar-tools\check-paper-tokens.mjs E:\dsh\dsh-paper-theme\lib\cli
 脚本查四项，退出码 0/1，可直接串进脚本：
 
 1. 覆盖表里的 token 名在宿主里是否还存在（不存在 = 覆盖静默失效）；
-2. 每项的 `dark` 值是否仍等于宿主**暗色作用域**的默认值（值漂移检测）；
-3. `dark` 里 `var(--dsw-static-*)` 引用的静态 token 是否还存在；
+2. `dark` 值是不是暖色（`R ≥ B`）、主文字 / 链接对 `bg-base` 的对比度是否仍达阈值
+   （R9 起暗色自持，不再比对宿主默认值）；
+3. 表内 `var()` 引用是否都还在（`dark` 只剩 `specific-menu` 一处，`light` 仍在用 static 引用）；
 4. 插件里以字符串字面量出现、但宿主完全没提过的 token 名。
 
 另外两个配套脚本（同在 `E:\dsh\dsh-asar-tools`）：
@@ -177,6 +187,10 @@ node E:\dsh\dsh-asar-tools\paper-coverage.mjs "<app.asar>" E:\dsh\dsh-paper-them
 | 0.2.0-rc.2（R7 增补） | **37 项**（+1）。新增 `--dsw-alias-label-primary-bluish`：浅色默认 `var(--dsw-static-blue-900)`（`#0e3074`）、暗色默认 `var(--dsw-static-neutral-bluish-50)`（已逐字抄进 dark）、1 个真实消费方（`dsh-client-ui-conversation`，即首屏「预览版」徽标文字）。`check-paper-tokens.mjs` 复核：37/37 名称存在、37/37 暗色零漂移、15/15 静态引用存在 |
 | **0.2.2-rc.1** | **36 项**（删 1 项）。design-platform.css 现在定义 **201** 项（rc.2 为 190，净 +12/−1）：新增 `--dsw-alias-illustration-*` 6 项（Schedule 空状态插画）、`state-done-primary` 与 4 个静态色；删除 `--dsw-specific-sidebar-nav-item-hover`（全 asar 无 `var()` 消费方，侧栏悬停改走半透明 `interactive-bg-hover`）。`--dsw-menu-surface-fill` 暗色默认 `#43454a73` → `#303136a3`（下表已跟随；浅色默认由 `#f8f9fa94` 变 `#fcfdfeb3`，本表用纸色 58% alpha 不跟随）。`check-paper-tokens.mjs` 复核：36/36 名称存在、36/36 暗色零漂移、15/15 静态引用存在；`client-smoke.mjs` 0 告警 |
 | 0.2.2-rc.1（R8 增补） | **41 项**（+5）。新增 Schedule 空状态插画 4 个画色（`inset`/`shadow` 引用 `surface`/`backing`，自动跟随）与选择器选中格的 `--dsw-alias-button-ghost-active-border`；取值均为纸色梯度（插画 `240,233,211` / `246,240,212` / `252,250,241`、细节 `198,184,152`；描边 `rgb(150,135,105)`）。`check-paper-tokens.mjs` 复核：41/41 名称存在、41/41 暗色零漂移、16/16 静态引用存在；`client-smoke.mjs` 41 项、0 告警 |
+| **0.2.2-rc.2** | **41 项**（不变）。design-platform.css 现在定义 **237** 项（rc.1 为 201，**净 +36 / −0**）；原 41 项名全部仍在、**浅色默认值零漂移、暗色默认值零漂移**、16 个静态引用全在、41 项都有 `var()` 消费方。新增 36 项按既定口径全部不覆盖：纯 alpha/color-mix（`sidebar-glass-*`、`sidebar-tint`、`sidebar-wash-*`、`file-upload-track`、`card-tile-fill`）、中性色不冷（`card-fill(-hover)`、`guide-hero`）、语义/图表/语法高亮（`chart-messages/system/tools`、`trajectory-accent`、`right-flash`、`json-tree-*`）、白字标签（`label-on-color`、`tooltip-label`、`hovercard-label-*`）、恒深色浮层（`hovercard-bg`）。唯一边界项 `--dsw-alias-border-selected`（冷色不透明描边）只被 `dsh-client-ui-agent-preset` 引用、不在主界面，仍不覆盖。`check-paper-tokens.mjs` 41/41 + 3 项全过、`client-smoke.mjs` 41 项 0 告警、`paper-coverage.mjs` 无死覆盖；真机 GUI body 上 41/41 computed 值命中 |
+
+| **0.3.0（R9 暗色）** | **44 项**（+3）。暗色从「抄宿主默认」改为自成一色「纸灯」：41 项 `dark` 换成写死字面量 + 新增三支文字色（`light` 写回宿主默认引用，浅色零改动）。体检口径随之改：`check-paper-tokens.mjs` 的「暗色零漂移」断言作废，换成「暗色值必须是暖色（`R ≥ B`）+ 文字对底色对比度达标」。真机 1600×1000 GPU 无头 Chrome 在浅色 / 暗色两种模式下各验一遍 `body` 行内覆盖 |
+| **0.3.1（R9.1 文字压暗）** | 44 项（不变）。用户反馈暗色主文字偏亮：主文字 `#f6efdc`（15.14:1）→ `#ddd4bf`（11.78:1），次文字 `#d2c8b2` → `#b8ae9a`（7.91:1），链接 `#e3bd8a` → `#c9a67b`（7.63:1），三级 `#afa492` 不动（7.07:1 已贴 AAA 地板）。7:1 是下限不是目标 —— 15:1 在暖黑底上长时间阅读发白刺眼；压到主流暗色主题的 11–12:1 区间，四支仍全过 AAA。`light` 列未动，浅色零影响 |
 
 ### R7 的真机验收数据（0.2.0-rc.2，2026-10-14）
 
@@ -200,13 +214,29 @@ node E:\dsh\dsh-asar-tools\paper-coverage.mjs "<app.asar>" E:\dsh\dsh-paper-them
 | 日期 / 时间选择器选中格 | 选中底 `rgb(238,222,178)` + 描边 `rgb(150,135,105)`，选中态一眼可分、不再有冷灰圈 |
 | 回归 | `node --check` 通过；`check-paper-tokens.mjs` 41/41、41/41、16/16；`client-smoke.mjs` 41 项、0 告警；`paper-coverage.mjs` 无「空覆盖」提示 |
 
+### R9 的暗色验收（0.2.2-rc.2，2026-11-12）
+
+同一条 GPU 路径（NVIDIA RTX 5060 Ti / ANGLE D3D11），在与真机同一页面上先摘掉插件行内覆盖、
+加 `body[data-ds-dark-theme]` 得到**宿主暗色基线**（`--dsw-alias-bg-base` = `#151517`，与宿主 CSS 一致，
+说明对照可信），再把候选值写回行内做同屏对比：
+
+| 项 | 结果 |
+|---|---|
+| 方向对比 | A 暖灰去蓝 / B 墨夜纸 / C 纸灯 各拍首页 + 插件页；选定 C（明度略抬、棕味更重） |
+| 暗色落位 | `bg-base` `#1c1a16`、`label-primary` `#ddd4bf`、`link` `#c9a67b`，与 `PAPER_TOKENS` dark 列逐项一致 |
+| 对比度 | 正文 11.78:1、次要 7.91:1、三级 7.07:1、链接 7.63:1、徽标文字 14.87:1 —— 全部 ≥ AAA 的 7:1 |
+| 浅色回归 | `light` 列零改动；新增三支文字色的 `light` 值等于宿主默认引用，浅色外观不变 |
+| 纯 alpha 层 | 侧栏 `sidebar-glass-*`、`border-l*`、`interactive-bg-*` 仍不覆盖，叠在暖底上自动变暖 |
+
 ## 已知失效模式
 
 - `overrideTokens` 的 `validateOverrides` 只校验值是不是 `{ light, dark }` 字符串对，
   **不校验 token 名**：宿主把某个 token 改名后，覆盖层既不报错也不生效 —— 静默失效。
   插件启动时会扫样式表自检，缺了就打印一条 console 警告（见 `verifyTokens`）。
-- **值漂移自检抓不到**：宿主改了某个 token 的暗色默认值，覆盖层照旧生效但取值过时。
-  只能靠上面那条命令回归。
+- **暗色不再跟宿主走**（R9 起是有意为之）：`dark` 列写死，宿主改暗色默认值本表不会跟随。
+  这是「暗色也做纸色」的必然代价 —— 宿主没有暖色 ramp 可以引用。
+- **对比度自检靠脚本**：暖黑白字是否仍然可读，由 `check-paper-tokens.mjs` 的对比度项把关，
+  改任何一个暗色值都要跑一次。
 - **消费方消失自检也抓不到**：宿主删掉某个 token 的唯一 `var()` 引用后，覆盖照旧注册、
   不报错，只是不再有任何视觉效果。`paper-coverage.mjs` 专治这一项。
 - 自检判据读的是页面已挂载的样式表；若 ui-theme 的样式表尚未挂载，自检会跳过而不是误报。
