@@ -1,7 +1,7 @@
 {
   "name": "dsh-paper-theme",
-  "description": "纸色暖调主题（浅色米黄纸 + 暗色纸灯暖黑），44 项 token 覆盖，verified against dsh 0.2.2-rc.2",
-  "version": "0.3.1",
+  "description": "纸色主题（浅色 = Flexoki 纸白，暗色 = 纸灯暖黑），45 项 token 覆盖，verified against dsh 0.2.2-rc.5",
+  "version": "0.4.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
